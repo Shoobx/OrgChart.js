@@ -12,7 +12,9 @@ export default class OrgChart {
 
     let that = this,
       defaultOptions = {
-        'nodeTitle': 'name',
+        'nodeTitle': null,
+        'firstLine': null,
+        'secondLine': null,
         'nodeId': 'id',
         'toggleSiblingsResp': false,
         'depth': 999,
@@ -1388,12 +1390,13 @@ export default class OrgChart {
         if (nodeData.avatarUrl && nodeData.avatarUrl.length > 0) {
           avatar.setAttribute('style', `background-image: url(${nodeData.avatarUrl});`);
         } else {
-          const firstLetter = nodeData.name[0];
+          const name = nodeData[opts.firstLine];
+          const firstLetter = name[0];
           let secondLetter = '';
-          const secondLetterIndex = nodeData.name.indexOf(' ');
+          const secondLetterIndex = name.indexOf(' ');
 
           if (secondLetterIndex > -1) {
-            secondLetter = nodeData.name[secondLetterIndex + 1];
+            secondLetter = name[secondLetterIndex + 1];
           }
 
           avatar.innerHTML = firstLetter + secondLetter;
@@ -1402,11 +1405,20 @@ export default class OrgChart {
         nodeDiv.append(avatar);
       }
 
-      if (!nodeData.root && opts.nodeContent) {
+      if (!nodeData.root && opts.firstLine) {
         const contentEl = document.createElement('div');
 
         contentEl.classList.add('content');
-        contentEl.innerHTML = nodeData[opts.nodeContent];
+        contentEl.innerHTML = nodeData[opts.firstLine];
+
+        if (opts.secondLine) {
+          const contentEl2 = document.createElement('div');
+
+          contentEl2.classList.add('contentSecondLine');
+          contentEl2.innerHTML = nodeData[opts.secondLine];
+          contentEl.append(contentEl2);
+        }
+
         nodeDiv.append(contentEl);
       }
 
