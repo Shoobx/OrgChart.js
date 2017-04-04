@@ -23,7 +23,8 @@ export default class OrgChart {
         'draggable': false,
         'direction': 't2b',
         'pan': false,
-        'zoom': false
+        'zoom': false,
+        'showAvatars': false
       },
       opts = Object.assign(defaultOptions, options),
       data = opts.data,
@@ -1366,10 +1367,49 @@ export default class OrgChart {
       if (nodeData.parentId) {
         nodeDiv.setAttribute('data-parent', nodeData.parentId);
       }
-      nodeDiv.innerHTML = `
-        <div class="title">${nodeData[opts.nodeTitle]}</div>
-        ${opts.nodeContent ? `<div class="content">${nodeData[opts.nodeContent]}</div>` : ''}
-      `;
+
+      if (nodeData.root) {
+        nodeDiv.classList.add('rootNode');
+      }
+
+      const titleEl = document.createElement('div');
+
+      titleEl.classList.add('title');
+      titleEl.innerHTML = nodeData[opts.nodeTitle];
+      nodeDiv.append(titleEl);
+
+      if (!nodeData.root && opts.showAvatars) {
+        nodeDiv.classList.add('withAvatar');
+
+        const avatar = document.createElement('div');
+
+        avatar.classList.add('avatar');
+
+        if (nodeData.avatarUrl && nodeData.avatarUrl.length > 0) {
+          avatar.setAttribute('style', `background-image: url(${nodeData.avatarUrl});`);
+        } else {
+          const firstLetter = nodeData.name[0];
+          let secondLetter = '';
+          const secondLetterIndex = nodeData.name.indexOf(' ');
+
+          if (secondLetterIndex > -1) {
+            secondLetter = nodeData.name[secondLetterIndex + 1];
+          }
+
+          avatar.innerHTML = firstLetter + secondLetter;
+        }
+
+        nodeDiv.append(avatar);
+      }
+
+      if (!nodeData.root && opts.nodeContent) {
+        const contentEl = document.createElement('div');
+
+        contentEl.classList.add('content');
+        contentEl.innerHTML = nodeData[opts.nodeContent];
+        nodeDiv.append(contentEl);
+      }
+
       // append 4 direction arrows or expand/collapse buttons
       let flags = nodeData.relationship || '';
 

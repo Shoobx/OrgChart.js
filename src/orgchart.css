@@ -238,7 +238,13 @@
   white-space: nowrap;
   background-color: rgba(217, 83, 79, 0.8);
   color: #fff;
-  border-radius: 4px 4px 0 0; 
+  border-radius: 4px 4px 0 0;
+}
+
+.orgchart .node.rootNode .title {
+  height: 40px;
+  line-height: 40px;
+  border-radius: 4px;
 }
 
 .orgchart.b2t .node .title {
@@ -278,8 +284,10 @@
 
 .orgchart .node .title .symbol {
   float: left;
-  margin-top: 4px;
-  margin-left: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: 4px;
+  position: relative;
 }
 
 .orgchart .node .content {
@@ -330,6 +338,30 @@
   -webkit-transform-origin: top center;
   transform-origin: top center;
   width: 120px;
+}
+
+.orgchart .node.withAvatar {
+  padding-left: 23px;
+}
+
+.orgchart .node.withAvatar .title,
+.orgchart .node.withAvatar .content {
+  padding-left: 20px;
+}
+
+.orgchart .node .avatar {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 40px;
+  height: 40px;
+  line-height: 38px;
+  overflow: hidden;
+  border-radius: 50%;
+  background-color: #fff;
+  background-size: cover;
+  background-position: center center;
+  border: 1px solid rgba(217, 83, 79, 0.8);
 }
 
 .orgchart .node .edge {

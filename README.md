@@ -65,8 +65,9 @@ let orgchart = new OrgChart({
 let datascource = {
   'name': 'Lao Lao',
   'title': 'general manager',
+  'root': true,
   'children': [
-    { 'name': 'Bo Miao', 'title': 'department manager' },
+    { 'name': 'Bo Miao', 'title': 'department manager', avatarUrl: 'image.png' },
     { 'name': 'Su Miao', 'title': 'department manager',
       'children': [
         { 'name': 'Tie Hua', 'title': 'senior engineer' },
@@ -90,7 +91,8 @@ orgchart = new OrgChart({
   'chartContainer': '#chart-container',
   'data' : datascource,
   'depth': 2,
-  'nodeContent': 'title'
+  'nodeContent': 'title',
+  'showAvatars': true
 });
 ```
 ![local datasource](http://dabeng.github.io/OrgChart.js/local-datasource/recorder.gif)
@@ -325,7 +327,7 @@ function addNodes(orgchart) {
   Array.from(document.getElementById('new-nodelist').querySelectorAll('.new-node'))
     .forEach(item => {
       let validVal = item.value.trim();
-        
+
       if (validVal) {
         nodeVals.push(validVal);
       }
@@ -475,7 +477,7 @@ let orgchart = new OrgChart({
 
 document.querySelector('#btn-export-hier').addEventListener('click', () => {
   if (!document.querySelector('pre')) {
-    let pre = document.createElement('pre'), 
+    let pre = document.createElement('pre'),
       hierarchy = orgchart.getHierarchy();
 
     pre.innerHTML = JSON.stringify(hierarchy, null, 2);

@@ -12,7 +12,8 @@ var gulp = require('gulp'),
   path = require('path'),
   del = require('del'),
   merge = require('merge-stream'),
-  plumber = require('gulp-plumber');
+  plumber = require('gulp-plumber'),
+  rollup = require('gulp-rollup');
 
 gulp.task('cleanCSS', function() {
   return del(['build/css']);
@@ -40,7 +41,8 @@ gulp.task('css', ['csslint', 'cleanCSS'], function() {
     .pipe(rename('orgchart.min.css'))
     .pipe(sourcemaps.write())
     .pipe(gulp.dest('build/css'))
-    .pipe(gulp.dest('demo/css'));
+    .pipe(gulp.dest('demo/css'))
+    .pipe(gulp.dest('dest'));
 });
 
 gulp.task('eslint', function () {
@@ -63,6 +65,15 @@ gulp.task('js', ['eslint', 'cleanJS'], function () {
     .pipe(gulp.dest('demo/js'));
 });
 
+gulp.task('js-module', ['eslint', 'cleanJS'], function () {
+  return gulp.src(['src/orgchart.js'])
+    .pipe(rollup({entry: 'src/orgchart.js'}))
+    .pipe(babel({presets: ['es2015']}))
+    .pipe(uglify())
+    .pipe(rename('orgchart.min.js'))
+    .pipe(gulp.dest('dest'));
+});
+
 gulp.task('watch', function () {
   gulp.watch('src/*.js', ['js']);
   gulp.watch('src/*.css', ['css']);
@@ -82,6 +93,8 @@ gulp.task('copyVendorAssets', function() {
 });
 
 gulp.task('build', ['css', 'js', 'watch']);
+
+gulp.task('build-module', ['css', 'js-module', 'watch']);
 
 gulp.task('webpack', ['build'], function () {
   webpack(require('./webpack.config.js'), function(err, stats) {
