@@ -12,6 +12,7 @@ export default class OrgChart {
 
     let that = this,
       defaultOptions = {
+        'rootNodeTitle': null,
         'nodeTitle': null,
         'firstLine': null,
         'secondLine': null,
@@ -1377,7 +1378,7 @@ export default class OrgChart {
       const titleEl = document.createElement('div');
 
       titleEl.classList.add('title');
-      titleEl.innerHTML = nodeData[opts.nodeTitle];
+      titleEl.innerHTML = nodeData.root ? nodeData[opts.rootNodeTitle] : nodeData[opts.nodeTitle];
       nodeDiv.append(titleEl);
 
       if (!nodeData.root && opts.showAvatars) {
@@ -1411,7 +1412,7 @@ export default class OrgChart {
         contentEl.classList.add('content');
         contentEl.innerHTML = nodeData[opts.firstLine];
 
-        if (opts.secondLine) {
+        if (opts.secondLine && nodeData[opts.secondLine] && nodeData[opts.secondLine].length > 0) {
           const contentEl2 = document.createElement('div');
 
           contentEl2.classList.add('contentSecondLine');
