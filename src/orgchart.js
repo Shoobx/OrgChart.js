@@ -1363,7 +1363,7 @@ export default class OrgChart {
       } else {
         isHidden = level >= opts.depth ? ' slide-up' : '';
       }
-      nodeDiv.setAttribute('class', 'node ' + (nodeData.className || '') + isHidden);
+      nodeDiv.setAttribute('class', 'node ' + (nodeData.color || '') + isHidden);
       if (opts.draggable) {
         nodeDiv.setAttribute('draggable', true);
       }
