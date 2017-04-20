@@ -1,3 +1,5 @@
+import html2canvas from 'html2canvas/dist/html2canvas.js';
+
 export default class OrgChart {
   constructor(options) {
     this._name = 'OrgChart';
@@ -27,7 +29,9 @@ export default class OrgChart {
         'direction': 't2b',
         'pan': false,
         'zoom': false,
-        'showAvatars': false
+        'showAvatars': false,
+        'colored': false,
+        'onNodeSelect': null
       },
       opts = Object.assign(defaultOptions, options),
       data = opts.data,
@@ -93,11 +97,20 @@ export default class OrgChart {
       document.body.addEventListener('touchend', this._onTouchEnd.bind(this));
     }
 
+    if (opts.colored) {
+      chart.classList.add('colored');
+    }
+
     chartContainer.appendChild(chart);
   }
   get name() {
     return this._name;
   }
+
+  toggleColors() {
+    this.chart.classList.toggle('colored');
+  }
+
   _closest(el, fn) {
     return el && ((fn(el) && el !== this.chart) ? el : this._closest(el.parentNode, fn));
   }
@@ -357,14 +370,11 @@ export default class OrgChart {
   }
   // define node click event handler
   _clickNode(event) {
-    let clickedNode = event.currentTarget,
-      focusedNode = this.chart.querySelector('.focused');
-
-    if (focusedNode) {
-      focusedNode.classList.remove('focused');
+    if (this.options.onNodeSelect) {
+      this.options.onNodeSelect(JSON.parse(event.currentTarget.dataset.source));
     }
-    clickedNode.classList.add('focused');
   }
+
   // build the parent node of specific node
   _buildParentNode(currentRoot, nodeData, callback) {
     let that = this,
@@ -1521,7 +1531,8 @@ export default class OrgChart {
       }
       let isHidden,
         isVerticalLayer = opts.verticalDepth && (level + 2) >= opts.verticalDepth,
-        inEdit = that.chart.dataset.inEdit;
+        inEdit = that.chart.dataset.inEdit,
+        borderColor = nodeData.border_color ? ` border-${nodeData.border_color}` : '';
 
       if (inEdit) {
         isHidden = inEdit === 'addSiblings' ? '' : ' hidden';
@@ -1533,7 +1544,7 @@ export default class OrgChart {
       if (!isVerticalLayer) {
         let tr = document.createElement('tr');
 
-        tr.setAttribute('class', 'lines' + isHidden);
+        tr.setAttribute('class', 'lines' + isHidden + borderColor);
         tr.innerHTML = `
           <td colspan="${ childNodes.length * 2 }">
             <div class="downLine"></div>
@@ -1544,7 +1555,7 @@ export default class OrgChart {
       // draw the lines close to children nodes
       let lineLayer = document.createElement('tr');
 
-      lineLayer.setAttribute('class', 'lines' + isHidden);
+      lineLayer.setAttribute('class', 'lines' + isHidden + borderColor);
       lineLayer.innerHTML = `
         <td class="rightLine">&nbsp;</td>
         ${childNodes.slice(1).map(() => `
@@ -1563,7 +1574,7 @@ export default class OrgChart {
         if (level + 2 === opts.verticalDepth) {
           let tr = document.createElement('tr');
 
-          tr.setAttribute('class', 'verticalNodes' + isHidden);
+          tr.setAttribute('class', 'verticalNodes' + isHidden + borderColor);
           tr.innerHTML = `<td></td>`;
           tr.firstChild.appendChild(nodeLayer);
           nodeWrapper.appendChild(tr);
@@ -1582,6 +1593,7 @@ export default class OrgChart {
 
         if (isVerticalLayer) {
           nodeCell = document.createElement('li');
+          nodeCell.setAttribute('class', borderColor);
         } else {
           nodeCell = document.createElement('td');
           nodeCell.setAttribute('colspan', 2);
@@ -1616,7 +1628,7 @@ export default class OrgChart {
       mask.classList.remove('hidden');
     }
     chartContainer.classList.add('canvasContainer');
-    window.html2canvas(sourceChart, {
+    html2canvas(sourceChart, {
       'width': flag ? sourceChart.clientHeight : sourceChart.clientWidth,
       'height': flag ? sourceChart.clientWidth : sourceChart.clientHeight,
       'onclone': function (cloneDoc) {
