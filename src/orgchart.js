@@ -28,6 +28,8 @@ export default class OrgChart {
         'pan': false,
         'zoom': false,
         'showAvatars': false,
+        'colors': null,
+        'borderColors': null,
         'colored': false,
         'onNodeSelect': null,
         'onShowAllClick': null
@@ -1372,7 +1374,8 @@ export default class OrgChart {
       } else {
         isHidden = level >= opts.depth ? ' slide-up' : '';
       }
-      nodeDiv.setAttribute('class', 'node ' + (nodeData.color || '') + isHidden);
+
+      nodeDiv.setAttribute('class', 'node ' + (opts.colors[nodeData.color] || '') + isHidden);
       if (opts.draggable) {
         nodeDiv.setAttribute('draggable', true);
       }
@@ -1557,7 +1560,7 @@ export default class OrgChart {
       let isHidden,
         isVerticalLayer = opts.verticalDepth && (level + 2) >= opts.verticalDepth,
         inEdit = that.chart.dataset.inEdit,
-        borderColor = nodeData.border_color ? ` border-${nodeData.border_color}` : '';
+        borderColor = nodeData.border_color ? ` border-${opts.borderColors[nodeData.border_color]}` : '';
 
       if (inEdit) {
         isHidden = inEdit === 'addSiblings' ? '' : ' hidden';
