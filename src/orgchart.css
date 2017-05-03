@@ -405,7 +405,7 @@
   height: calc(100% - 10px);
   height: -webkit-calc(100% - 10px);
   height: -moz-calc(100% - 10px);
-  top: 0px;
+  top: 0;
 }
 
 .orgchart .node .rightEdge {
@@ -534,4 +534,32 @@
 
 .orgchart.l2r .node.slide-left, .orgchart.r2l .node.slide-left {
   left: -40px;
+}
+
+
+.show-all {
+  width: 60px;
+  height: 30px;
+  border: 1px solid #97AAAA;
+  line-height: 22px;
+  position: absolute;
+  top: -26px;
+  left: 87.5px;
+  padding: 4px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  background: #dddddd;
+  text-align: center;
+  cursor: pointer;
+}
+
+.show-all .fa {
+  vertical-align: top;
+  line-height: 22px;
+  padding: 0 2px;
+}
+
+.show-all .fa-angle-double-up {
+  font-size: 22px;
+  color: #ca7b00;
 }

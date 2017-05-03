@@ -29,7 +29,8 @@ export default class OrgChart {
         'zoom': false,
         'showAvatars': false,
         'colored': false,
-        'onNodeSelect': null
+        'onNodeSelect': null,
+        'onShowAllClick': null
       },
       opts = Object.assign(defaultOptions, options),
       data = opts.data,
@@ -1381,6 +1382,32 @@ export default class OrgChart {
 
       if (nodeData.root) {
         nodeDiv.classList.add('rootNode');
+      }
+
+      if (nodeData.hasSubordinates) {
+        const showAllEl = document.createElement('div');
+
+        showAllEl.classList.add('show-all');
+
+        if (opts.onShowAllClick) {
+          showAllEl.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            opts.onShowAllClick();
+          });
+        }
+
+        const iconGroupEl = document.createElement('i');
+
+        iconGroupEl.classList.add('fa', 'fa-group');
+        showAllEl.append(iconGroupEl);
+
+        const iconDoubleEl = document.createElement('i');
+
+        iconDoubleEl.classList.add('fa', 'fa-angle-double-up');
+        showAllEl.append(iconDoubleEl);
+
+        nodeDiv.prepend(showAllEl);
       }
 
       const titleEl = document.createElement('div');
