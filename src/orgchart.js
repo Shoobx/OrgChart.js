@@ -349,25 +349,25 @@ export default class OrgChart {
       bottomEdge = node.querySelector(':scope > .bottomEdge'),
       leftEdge = node.querySelector(':scope > .leftEdge');
 
-    if (event.type === 'mouseenter') {
-      if (topEdge) {
-        flag = this._getNodeState(node, 'parent').visible;
-        topEdge.classList.toggle('fa-chevron-up', !flag);
-        topEdge.classList.toggle('fa-chevron-down', flag);
-      }
-      if (bottomEdge) {
-        flag = this._getNodeState(node, 'children').visible;
-        bottomEdge.classList.toggle('fa-chevron-down', !flag);
-        bottomEdge.classList.toggle('fa-chevron-up', flag);
-      }
-      if (leftEdge) {
-        this._switchHorizontalArrow(node);
-      }
-    } else {
-      Array.from(node.querySelectorAll(':scope > .edge')).forEach((el) => {
-        el.classList.remove('fa-chevron-up', 'fa-chevron-down', 'fa-chevron-right', 'fa-chevron-left');
-      });
-    }
+    // if (event.type === 'mouseenter') {
+    //   if (topEdge) {
+    //     flag = this._getNodeState(node, 'parent').visible;
+    //     topEdge.classList.toggle('fa-chevron-up', !flag);
+    //     topEdge.classList.toggle('fa-chevron-down', flag);
+    //   }
+    //   if (bottomEdge) {
+    //     flag = this._getNodeState(node, 'children').visible;
+    //     bottomEdge.classList.toggle('fa-chevron-down', !flag);
+    //     bottomEdge.classList.toggle('fa-chevron-up', flag);
+    //   }
+    //   if (leftEdge) {
+    //     this._switchHorizontalArrow(node);
+    //   }
+    // } else {
+    //   Array.from(node.querySelectorAll(':scope > .edge')).forEach((el) => {
+    //     el.classList.remove('fa-chevron-up', 'fa-chevron-down', 'fa-chevron-right', 'fa-chevron-left');
+    //   });
+    // }
   }
   // define node click event handler
   _clickNode(event) {
@@ -415,8 +415,8 @@ export default class OrgChart {
       });
   }
   _switchVerticalArrow(arrow) {
-    arrow.classList.toggle('fa-chevron-up');
-    arrow.classList.toggle('fa-chevron-down');
+    arrow.classList.toggle('fa-minus-square');
+    arrow.classList.toggle('fa-plus-square');
   }
   // show the parent node of the specified node
   showParent(node) {
@@ -487,8 +487,8 @@ export default class OrgChart {
       });
       if (this._isInAction(node)) {
         this._switchHorizontalArrow(node);
-        node.querySelector('.topEdge').classList.remove('fa-chevron-up');
-        node.querySelector('.topEdge').classList.add('fa-chevron-down');
+        node.querySelector('.bottomEdge').classList.remove('fa-plus-square');
+        node.querySelector('.bottomEdge').classList.add('fa-minus-square');
       }
     }, this);
   }
@@ -745,6 +745,13 @@ export default class OrgChart {
 
     if (!isVerticalDesc) {
       descendants.forEach((desc) => {
+        let bottomEdgeEl = desc.querySelector('.bottomEdge-click');
+
+        if (bottomEdgeEl) {
+          bottomEdgeEl.classList.remove('fa-minus-square')
+          bottomEdgeEl.classList.add('fa-plus-square')
+        }
+
         Array.prototype.push.apply(lines,
           that._prevAll(that._closest(desc, (el) => el.classList.contains('nodes')), '.lines'));
       });
@@ -1134,9 +1141,9 @@ export default class OrgChart {
       this._clickTopEdge(event);
     } else if (classList.contains('rightEdge') || classList.contains('leftEdge')) {
       this._clickHorizontalEdge(event);
-    } else if (classList.contains('bottomEdge')) {
+    } else if (classList.contains('bottomEdge-click')) {
       this._clickBottomEdge(event);
-    } else if (classList.contains('toggleBtn')) {
+    } else if (classList.contains('toggleBtn-click')) {
       this._clickToggleButton(event);
     } else {
       this._clickNode(event);
@@ -1375,7 +1382,9 @@ export default class OrgChart {
         isHidden = level >= opts.depth ? ' slide-up' : '';
       }
 
-      nodeDiv.setAttribute('class', 'node ' + (opts.colors[nodeData.color] || '') + isHidden);
+      const borderColor = nodeData.border_color ? ` border-${opts.borderColors[nodeData.border_color]}` : '';
+
+      nodeDiv.setAttribute('class', 'node ' + (opts.colors[nodeData.color] || '') + borderColor + isHidden);
       if (opts.draggable) {
         nodeDiv.setAttribute('draggable', true);
       }
@@ -1461,42 +1470,23 @@ export default class OrgChart {
         nodeDiv.append(contentEl);
       }
 
-      // append 4 direction arrows or expand/collapse buttons
+      // append toggle button
       let flags = nodeData.relationship || '';
-
-      if (opts.verticalDepth && (level + 2) > opts.verticalDepth) {
+      if (opts.verticalDepth && (level + 2) > opts.verticalDepth || Number(flags.substr(2, 1))) {
         if ((level + 1) >= opts.verticalDepth && Number(flags.substr(2, 1))) {
           let toggleBtn = document.createElement('i'),
             icon = level + 1 >= opts.depth ? 'plus' : 'minus';
 
-          toggleBtn.setAttribute('class', 'toggleBtn fa fa-' + icon + '-square');
+          toggleBtn.setAttribute('class', 'toggleBtn toggleBtn-click fa fa-' + icon + '-square');
           nodeDiv.appendChild(toggleBtn);
-        }
-      } else {
-        if (Number(flags.substr(0, 1))) {
-          let topEdge = document.createElement('i');
+        } else {
+          if (Number(flags.substr(2, 1)) && !nodeData.root) {
+            let toggleBtn = document.createElement('i'),
+            icon = level + 1 >= opts.depth ? 'plus' : 'minus';
 
-          topEdge.setAttribute('class', 'edge verticalEdge topEdge fa');
-          nodeDiv.appendChild(topEdge);
-        }
-        if (Number(flags.substr(1, 1))) {
-          let rightEdge = document.createElement('i'),
-            leftEdge = document.createElement('i');
-
-          rightEdge.setAttribute('class', 'edge horizontalEdge rightEdge fa');
-          nodeDiv.appendChild(rightEdge);
-          leftEdge.setAttribute('class', 'edge horizontalEdge leftEdge fa');
-          nodeDiv.appendChild(leftEdge);
-        }
-        if (Number(flags.substr(2, 1))) {
-          let bottomEdge = document.createElement('i'),
-            symbol = document.createElement('i'),
-            title = nodeDiv.querySelector(':scope > .title');
-
-          bottomEdge.setAttribute('class', 'edge verticalEdge bottomEdge fa');
-          nodeDiv.appendChild(bottomEdge);
-          symbol.setAttribute('class', 'fa ' + opts.parentNodeSymbol + ' symbol');
-          title.insertBefore(symbol, title.children[0]);
+            toggleBtn.setAttribute('class', 'toggleBtn edge bottomEdge bottomEdge-click fa fa-' + icon + '-square');
+            nodeDiv.appendChild(toggleBtn);
+          }
         }
       }
 
@@ -1559,8 +1549,7 @@ export default class OrgChart {
       }
       let isHidden,
         isVerticalLayer = opts.verticalDepth && (level + 2) >= opts.verticalDepth,
-        inEdit = that.chart.dataset.inEdit,
-        borderColor = nodeData.border_color ? ` border-${opts.borderColors[nodeData.border_color]}` : '';
+        inEdit = that.chart.dataset.inEdit;
 
       if (inEdit) {
         isHidden = inEdit === 'addSiblings' ? '' : ' hidden';
@@ -1572,7 +1561,7 @@ export default class OrgChart {
       if (!isVerticalLayer) {
         let tr = document.createElement('tr');
 
-        tr.setAttribute('class', 'lines' + isHidden + borderColor);
+        tr.setAttribute('class', 'lines' + isHidden);
         tr.innerHTML = `
           <td colspan="${ childNodes.length * 2 }">
             <div class="downLine"></div>
@@ -1583,7 +1572,7 @@ export default class OrgChart {
       // draw the lines close to children nodes
       let lineLayer = document.createElement('tr');
 
-      lineLayer.setAttribute('class', 'lines' + isHidden + borderColor);
+      lineLayer.setAttribute('class', 'lines' + isHidden);
       lineLayer.innerHTML = `
         <td class="rightLine">&nbsp;</td>
         ${childNodes.slice(1).map(() => `
@@ -1602,7 +1591,7 @@ export default class OrgChart {
         if (level + 2 === opts.verticalDepth) {
           let tr = document.createElement('tr');
 
-          tr.setAttribute('class', 'verticalNodes' + isHidden + borderColor);
+          tr.setAttribute('class', 'verticalNodes' + isHidden);
           tr.innerHTML = `<td></td>`;
           tr.firstChild.appendChild(nodeLayer);
           nodeWrapper.appendChild(tr);
@@ -1621,7 +1610,6 @@ export default class OrgChart {
 
         if (isVerticalLayer) {
           nodeCell = document.createElement('li');
-          nodeCell.setAttribute('class', borderColor);
         } else {
           nodeCell = document.createElement('td');
           nodeCell.setAttribute('colspan', 2);
