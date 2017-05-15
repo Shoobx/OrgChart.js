@@ -342,33 +342,6 @@ export default class OrgChart {
       rightEdge.classList.toggle('fa-chevron-right', !sibsVisible);
     }
   }
-  _hoverNode(event) {
-    let node = event.target,
-      flag = false,
-      topEdge = node.querySelector(':scope > .topEdge'),
-      bottomEdge = node.querySelector(':scope > .bottomEdge'),
-      leftEdge = node.querySelector(':scope > .leftEdge');
-
-    // if (event.type === 'mouseenter') {
-    //   if (topEdge) {
-    //     flag = this._getNodeState(node, 'parent').visible;
-    //     topEdge.classList.toggle('fa-chevron-up', !flag);
-    //     topEdge.classList.toggle('fa-chevron-down', flag);
-    //   }
-    //   if (bottomEdge) {
-    //     flag = this._getNodeState(node, 'children').visible;
-    //     bottomEdge.classList.toggle('fa-chevron-down', !flag);
-    //     bottomEdge.classList.toggle('fa-chevron-up', flag);
-    //   }
-    //   if (leftEdge) {
-    //     this._switchHorizontalArrow(node);
-    //   }
-    // } else {
-    //   Array.from(node.querySelectorAll(':scope > .edge')).forEach((el) => {
-    //     el.classList.remove('fa-chevron-up', 'fa-chevron-down', 'fa-chevron-right', 'fa-chevron-left');
-    //   });
-    // }
-  }
   // define node click event handler
   _clickNode(event) {
     if (this.options.onNodeSelect) {
@@ -748,8 +721,8 @@ export default class OrgChart {
         let bottomEdgeEl = desc.querySelector('.bottomEdge-click');
 
         if (bottomEdgeEl) {
-          bottomEdgeEl.classList.remove('fa-minus-square')
-          bottomEdgeEl.classList.add('fa-plus-square')
+          bottomEdgeEl.classList.remove('fa-minus-square');
+          bottomEdgeEl.classList.add('fa-plus-square');
         }
 
         Array.prototype.push.apply(lines,
@@ -1472,6 +1445,7 @@ export default class OrgChart {
 
       // append toggle button
       let flags = nodeData.relationship || '';
+
       if (opts.verticalDepth && (level + 2) > opts.verticalDepth || Number(flags.substr(2, 1))) {
         if ((level + 1) >= opts.verticalDepth && Number(flags.substr(2, 1))) {
           let toggleBtn = document.createElement('i'),
@@ -1482,7 +1456,7 @@ export default class OrgChart {
         } else {
           if (Number(flags.substr(2, 1)) && !nodeData.root) {
             let toggleBtn = document.createElement('i'),
-            icon = level + 1 >= opts.depth ? 'plus' : 'minus';
+              icon = level + 1 >= opts.depth ? 'plus' : 'minus';
 
             toggleBtn.setAttribute('class', 'toggleBtn edge bottomEdge bottomEdge-click fa fa-' + icon + '-square');
             nodeDiv.appendChild(toggleBtn);
@@ -1490,8 +1464,6 @@ export default class OrgChart {
         }
       }
 
-      nodeDiv.addEventListener('mouseenter', that._hoverNode.bind(that));
-      nodeDiv.addEventListener('mouseleave', that._hoverNode.bind(that));
       nodeDiv.addEventListener('click', that._dispatchClickEvent.bind(that));
       if (opts.draggable) {
         nodeDiv.addEventListener('dragstart', that._onDragStart.bind(that));
