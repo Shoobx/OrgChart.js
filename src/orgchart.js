@@ -102,6 +102,7 @@ export default class OrgChart {
       chart.classList.add('colored');
     }
 
+    this.addZoomControls(chartContainer);
     chartContainer.appendChild(chart);
   }
   get name() {
@@ -110,6 +111,28 @@ export default class OrgChart {
 
   toggleColors() {
     this.chart.classList.toggle('colored');
+  }
+
+  addZoomControls(appendTo) {
+    let zoomContainerEl = document.createElement('div');
+
+    zoomContainerEl.classList.add('zoom-container');
+
+    let zoomInEl = document.createElement('div');
+
+    zoomInEl.classList.add('zoom-in');
+    zoomInEl.innerHTML = '<i class="fa fa-search-plus" aria-hidden="true"></i>';
+    zoomInEl.addEventListener('click', () => this._setChartScale(this.chart, true));
+    zoomContainerEl.appendChild(zoomInEl);
+
+    let zoomOutEl = document.createElement('div');
+
+    zoomOutEl.classList.add('zoom-out');
+    zoomOutEl.innerHTML = '<i class="fa fa-search-minus" aria-hidden="true"></i>';
+    zoomOutEl.addEventListener('click', () => this._setChartScale(this.chart, false));
+    zoomContainerEl.appendChild(zoomOutEl);
+
+    appendTo.append(zoomContainerEl);
   }
 
   _closest(el, fn) {
@@ -703,6 +726,32 @@ export default class OrgChart {
       }
     }
   }
+
+  _addShowAllBottom(node) {
+    const showAllEl = document.createElement('div');
+
+    showAllEl.classList.add('show-all', 'bottom');
+
+    showAllEl.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      node.querySelector('.toggleBtn').click();
+    });
+
+    const iconGroupEl = document.createElement('i');
+
+    iconGroupEl.classList.add('fa', 'fa-group');
+    showAllEl.append(iconGroupEl);
+
+    const iconDoubleEl = document.createElement('i');
+
+    iconDoubleEl.classList.add('fa', 'fa-angle-double-down');
+    showAllEl.append(iconDoubleEl);
+
+    node.append(showAllEl);
+  }
+
   // recursively hide the descendant nodes of the specified node
   hideChildren(node) {
     let that = this,
@@ -723,6 +772,8 @@ export default class OrgChart {
         if (bottomEdgeEl) {
           bottomEdgeEl.classList.remove('fa-minus-square');
           bottomEdgeEl.classList.add('fa-plus-square');
+
+          this._addShowAllBottom(desc);
         }
 
         Array.prototype.push.apply(lines,
@@ -748,6 +799,8 @@ export default class OrgChart {
       }
     }, this);
     this._addClass(descendants, 'slide slide-up');
+
+    this._addShowAllBottom(node);
   }
   // show the children nodes of the specified node
   showChildren(node) {
@@ -836,6 +889,9 @@ export default class OrgChart {
         this.hideChildren(node);
       } else { // show the descendants
         this.showChildren(node);
+
+        // Remove bottom arrows from clicked element
+        node.querySelectorAll('.show-all.bottom').forEach(el => el.remove());
       }
     } else { // load the new children nodes of the specified node by ajax request
       let nodeId = bottomEdge.parentNode.id;
@@ -1355,9 +1411,7 @@ export default class OrgChart {
         isHidden = level >= opts.depth ? ' slide-up' : '';
       }
 
-      const borderColor = nodeData.border_color ? ` border-${opts.borderColors[nodeData.border_color]}` : '';
-
-      nodeDiv.setAttribute('class', 'node ' + (opts.colors[nodeData.color] || '') + borderColor + isHidden);
+      nodeDiv.setAttribute('class', 'node ' + (opts.colors[nodeData.color] || '') + isHidden);
       if (opts.draggable) {
         nodeDiv.setAttribute('draggable', true);
       }
@@ -1436,8 +1490,20 @@ export default class OrgChart {
           const contentEl2 = document.createElement('div');
 
           contentEl2.classList.add('contentSecondLine');
-          contentEl2.innerHTML = nodeData[opts.secondLine];
+          contentEl2.innerHTML = nodeData[opts.secondLine].split(' : ').pop();
           contentEl.append(contentEl2);
+        }
+
+        if (nodeData.border_color) {
+          contentEl.classList.add('with-border-legend');
+
+          const borderColor = nodeData.border_color ? `border-${opts.borderColors[nodeData.border_color]}` : '';
+
+          const borderLegendEl = document.createElement('div');
+
+          borderLegendEl.classList.add('border-legend', borderColor);
+          borderLegendEl.innerHTML = borderColor.split('-').pop();
+          contentEl.append(borderLegendEl);
         }
 
         nodeDiv.append(contentEl);
@@ -1543,6 +1609,8 @@ export default class OrgChart {
       }
       // draw the lines close to children nodes
       let lineLayer = document.createElement('tr');
+
+      console.log(nodeData);
 
       lineLayer.setAttribute('class', 'lines' + isHidden);
       lineLayer.innerHTML = `
@@ -1751,24 +1819,24 @@ export default class OrgChart {
       document.body.removeEventListener('touchmove', this._onPanning);
     }
   }
-  _setChartScale(chart, newScale) {
-    let lastTf = window.getComputedStyle(chart).transform;
+  _setChartScale(chart, zoomIn) {
+    const scales = [0.25, 0.33, 0.5, 0.67, 0.75, 0.8, 0.9, 1, 1.1, 1.25, 1.5, 1.75, 2, 2.5, 3];
+    let scale = scales[7];
 
-    if (lastTf === 'none') {
-      chart.style.transform = 'scale(' + newScale + ',' + newScale + ')';
+    if (chart.style.transform.length === 0) {
+      scale = zoomIn ? scales[8] : scales[6];
+
+      chart.style.transform = `matrix(${scale}, 0, 0, ${scale}, 0, 0)`;
     } else {
-      let matrix = lastTf.split(',');
+      const matrix = JSON.parse(chart.style.transform.replace(/^\w+\(/, "[").replace(/\)$/, "]"));
+      const scaleIndex = scales.indexOf(matrix[0]);
 
-      if (!lastTf.includes('3d')) {
-        matrix[0] = 'matrix(' + newScale;
-        matrix[3] = newScale;
-        chart.style.transform = lastTf + ' scale(' + newScale + ',' + newScale + ')';
-      } else {
-        chart.style.transform = lastTf + ' scale3d(' + newScale + ',' + newScale + ', 1)';
-      }
+      scale = zoomIn ? scales[scaleIndex + 1] : scales[scaleIndex - 1];
+
+      chart.style.transform = `matrix(${scale}, ${matrix[1]}, ${matrix[2]}, ${scale}, ${matrix[4]}, ${matrix[5]})`;
     }
-    chart.dataset.scale = newScale;
   }
+
   _onWheeling(event) {
     event.preventDefault();
 
