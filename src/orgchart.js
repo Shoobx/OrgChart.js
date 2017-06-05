@@ -1610,8 +1610,6 @@ export default class OrgChart {
       // draw the lines close to children nodes
       let lineLayer = document.createElement('tr');
 
-      console.log(nodeData);
-
       lineLayer.setAttribute('class', 'lines' + isHidden);
       lineLayer.innerHTML = `
         <td class="rightLine">&nbsp;</td>
