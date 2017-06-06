@@ -69,7 +69,7 @@ gulp.task('js-module', ['eslint', 'cleanJS'], function () {
   return gulp.src(['src/orgchart.js'])
     .pipe(rollup({entry: 'src/orgchart.js'}))
     .pipe(babel({presets: ['es2015']}))
-    .pipe(uglify())
+    // .pipe(uglify())
     .pipe(rename('orgchart.min.js'))
     .pipe(gulp.dest('dest'));
 });
