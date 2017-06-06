@@ -132,7 +132,7 @@ export default class OrgChart {
     zoomOutEl.addEventListener('click', () => this._setChartScale(this.chart, false));
     zoomContainerEl.appendChild(zoomOutEl);
 
-    appendTo.append(zoomContainerEl);
+    appendTo.appendChild(zoomContainerEl);
   }
 
   _closest(el, fn) {
@@ -742,14 +742,14 @@ export default class OrgChart {
     const iconGroupEl = document.createElement('i');
 
     iconGroupEl.classList.add('fa', 'fa-group');
-    showAllEl.append(iconGroupEl);
+    showAllEl.appendChild(iconGroupEl);
 
     const iconDoubleEl = document.createElement('i');
 
     iconDoubleEl.classList.add('fa', 'fa-angle-double-down');
-    showAllEl.append(iconDoubleEl);
+    showAllEl.appendChild(iconDoubleEl);
 
-    node.append(showAllEl);
+    node.appendChild(showAllEl);
   }
 
   // recursively hide the descendant nodes of the specified node
@@ -1439,12 +1439,12 @@ export default class OrgChart {
         const iconGroupEl = document.createElement('i');
 
         iconGroupEl.classList.add('fa', 'fa-group');
-        showAllEl.append(iconGroupEl);
+        showAllEl.appendChild(iconGroupEl);
 
         const iconDoubleEl = document.createElement('i');
 
         iconDoubleEl.classList.add('fa', 'fa-angle-double-up');
-        showAllEl.append(iconDoubleEl);
+        showAllEl.appendChild(iconDoubleEl);
 
         nodeDiv.prepend(showAllEl);
       }
@@ -1453,7 +1453,7 @@ export default class OrgChart {
 
       titleEl.classList.add('title');
       titleEl.innerHTML = nodeData.root ? nodeData[opts.rootNodeTitle] : nodeData[opts.nodeTitle];
-      nodeDiv.append(titleEl);
+      nodeDiv.appendChild(titleEl);
 
       if (!nodeData.root && opts.showAvatars) {
         nodeDiv.classList.add('withAvatar');
@@ -1477,7 +1477,7 @@ export default class OrgChart {
           avatar.innerHTML = firstLetter + secondLetter;
         }
 
-        nodeDiv.append(avatar);
+        nodeDiv.appendChild(avatar);
       }
 
       if (!nodeData.root && opts.firstLine) {
@@ -1491,7 +1491,7 @@ export default class OrgChart {
 
           contentEl2.classList.add('contentSecondLine');
           contentEl2.innerHTML = nodeData[opts.secondLine].split(' : ').pop();
-          contentEl.append(contentEl2);
+          contentEl.appendChild(contentEl2);
         }
 
         if (nodeData.border_color) {
@@ -1503,10 +1503,10 @@ export default class OrgChart {
 
           borderLegendEl.classList.add('border-legend', borderColor);
           borderLegendEl.innerHTML = borderColor.split('-').pop();
-          contentEl.append(borderLegendEl);
+          contentEl.appendChild(borderLegendEl);
         }
 
-        nodeDiv.append(contentEl);
+        nodeDiv.appendChild(contentEl);
       }
 
       // append toggle button
