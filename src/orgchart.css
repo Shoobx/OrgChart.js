@@ -442,7 +442,7 @@
   opacity: 0.8;
 }
 
-.oc-export-btn {
+.orgchart .oc-export-btn {
   display: inline-block;
   position: absolute;
   right: 5px;
@@ -469,7 +469,7 @@
   border-radius: 4px;
 }
 
-.oc-export-btn:hover,.oc-export-btn:focus,.oc-export-btn:active  {
+.orgchart .oc-export-btn:hover,.oc-export-btn:focus,.oc-export-btn:active  {
   background-color: #449d44;
   border-color: #347a34;
 }
@@ -536,8 +536,7 @@
   left: -40px;
 }
 
-
-.show-all {
+.orgchart .show-all {
   width: 60px;
   height: 30px;
   border: 1px solid #97AAAA;
@@ -553,13 +552,13 @@
   cursor: pointer;
 }
 
-.show-all .fa {
+.orgchart .show-all .fa {
   vertical-align: top;
   line-height: 22px;
   padding: 0 2px;
 }
 
-.show-all .fa-angle-double-up {
+.orgchart .show-all .fa-angle-double-up {
   font-size: 22px;
   color: #ca7b00;
 }
