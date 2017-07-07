@@ -1824,14 +1824,26 @@ export default class OrgChart {
     if (chart.style.transform.length === 0) {
       scale = zoomIn ? scales[8] : scales[6];
 
-      chart.style.transform = `matrix(${scale}, 0, 0, ${scale}, 0, 0)`;
+      const newOffsetX = (-1) * (this.chart.clientWidth - this.chart.clientWidth * scale) / 2;
+      const newOffsetY = (-1) * (this.chart.clientHeight - this.chart.clientHeight * scale) / 2;
+
+      chart.style.transform = `matrix(${scale}, 0, 0, ${scale}, ${newOffsetX}, ${newOffsetY})`;
     } else {
       const matrix = JSON.parse(chart.style.transform.replace(/^\w+\(/, "[").replace(/\)$/, "]"));
       const scaleIndex = scales.indexOf(matrix[0]);
 
       scale = zoomIn ? scales[scaleIndex + 1] : scales[scaleIndex - 1];
 
-      chart.style.transform = `matrix(${scale}, ${matrix[1]}, ${matrix[2]}, ${scale}, ${matrix[4]}, ${matrix[5]})`;
+      const oldOffsetX = parseFloat(matrix[4] + (this.chart.clientWidth - this.chart.clientWidth * scales[scaleIndex]) / 2);
+      const oldOffsetY = parseFloat(matrix[5] + (this.chart.clientHeight - this.chart.clientHeight * scales[scaleIndex]) / 2);
+
+      const newOffsetX = parseFloat((this.chart.clientWidth - this.chart.clientWidth * scale) / 2);
+      const newOffsetY = parseFloat((this.chart.clientHeight - this.chart.clientHeight * scale) / 2);
+
+      let offsetX = oldOffsetX - newOffsetX;
+      let offsetY = oldOffsetY - newOffsetY;
+
+      chart.style.transform = `matrix(${scale}, ${matrix[1]}, ${matrix[2]}, ${scale}, ${offsetX}, ${offsetY})`;
     }
   }
 
