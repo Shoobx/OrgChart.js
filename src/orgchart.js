@@ -277,7 +277,7 @@ export default class OrgChart {
   }
   // whether the cursor is hovering over the node
   _isInAction(node) {
-    return node.querySelector(':scope > .edge').className.indexOf('fa-') > -1;
+    return node.querySelector('* > .edge').className.indexOf('fa-') > -1;
   }
   // detect the exist/display state of related node
   _getNodeState(node, relation) {
@@ -891,7 +891,7 @@ export default class OrgChart {
         this.showChildren(node);
 
         // Remove bottom arrows from clicked element
-        node.querySelectorAll('.show-all.bottom').forEach(el => el.remove());
+        Array.from(node.querySelectorAll('.show-all.bottom')).forEach(el => el.remove());
       }
     } else { // load the new children nodes of the specified node by ajax request
       let nodeId = bottomEdge.parentNode.id;
