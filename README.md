@@ -1,5 +1,7 @@
 ![OrgChart](http://dabeng.github.io/OrgChart.js/img/orgchart-heading.png)
 
+[![Maintainability](https://api.codeclimate.com/v1/badges/8bae7ac71e8aeb1156d6/maintainability)](https://codeclimate.com/github/Shoobx/OrgChart.js/maintainability)
+
 # [Perhaps you'd prefer the jQuery version](http://github.com/dabeng/OrgChart)
 # [Perhaps you'd prefer the Web Components version](http://github.com/dabeng/OrgChart-Webcomponents)
 
